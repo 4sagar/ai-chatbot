@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 
 interface FileData {
+  id: string;
   name: string;
   url: string;
 }
@@ -50,7 +51,7 @@ export function OneDrivePicker({ onFileSelect }: OneDrivePickerProps) {
         const fileUrl = file["@microsoft.graph.downloadUrl"];
         const fileName = file.name;
 
-        onFileSelect({ url: fileUrl, name: fileName });
+        onFileSelect({ id: file.id, url: fileUrl, name: fileName });
       },
       cancel: () => console.log("User canceled selection"),
       error: (err: any) => console.error("OneDrive Picker Error:", err),
