@@ -88,7 +88,7 @@ export function GoogleDrivePicker(props: GoogleDrivePickerProps) {
     if (authInitiated && accessToken) {
       loadPicker();
     }
-  }, [authInitiated, accessToken]);
+  }, [authInitiated, accessToken, props.onFileSelect]);
 
   return (
     <button onClick={loadPicker} disabled={!gapiLoaded || loading} {...props}>

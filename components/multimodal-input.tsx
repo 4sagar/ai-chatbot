@@ -36,6 +36,7 @@ import { PreviewAttachment } from "./preview-attachment";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { GoogleDrivePicker } from "./google-drive-picker";
+import { OneDrivePicker } from "./one-drive-picker";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -382,7 +383,7 @@ function PureAttachmentsButton({
           </DropdownMenuItem>
           <DropdownMenuItem>
             <OneDriveIcon />
-            Upload from One Drive
+            <OneDrivePicker onFileSelect={handleGoogleDriveFilePick} />
           </DropdownMenuItem>
           <DropdownMenuItem>
             <BoxIcon size={16} />
