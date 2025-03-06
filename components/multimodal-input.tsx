@@ -373,6 +373,7 @@ function PureAttachmentsButton({
     }
   };
 
+  // To import only images from notion
   const handleNotionFileDownload = async (files: string[]) => {
     const fileBlobs = await Promise.all(
       files.map((file, i) => downloadFile(file, `notion-file-${i + 1}`))
@@ -427,7 +428,7 @@ function PureAttachmentsButton({
       </DropdownMenu>
       <NotionHandler
         notionRef={notionRef}
-        onFileSelect={handleNotionFileDownload}
+        onFileSelect={handleUploadingProcess}
       />
     </>
   );

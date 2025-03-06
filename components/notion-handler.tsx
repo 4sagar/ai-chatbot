@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 
 interface NotionHandlerProps {
-  onFileSelect: (files: string[]) => void;
+  onFileSelect: (files: File[]) => void;
   notionRef?: { triggerNotionImport: () => void };
 }
 
@@ -52,20 +52,44 @@ export function NotionHandler({ onFileSelect, notionRef }: NotionHandlerProps) {
 
       if (data.results.length === 0) throw new Error("No pages found.");
 
-      const pageRes = await fetch(`/api/notion/page/${data.results[0].id}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-      const pageData = await pageRes.json();
+      // Fetch markdown for each page and create File objects
+      const fileBlobs = await Promise.all(
+        data.results.map(
+          async (page: {
+            id: string;
+            properties: {
+              title: { id: string; title: { plain_text: string }[] };
+            };
+          }) => {
+            const pageRes = await fetch(
+              `/api/notion/page/${page.id}/markdown`,
+              {
+                headers: { Authorization: `Bearer ${accessToken}` },
+              }
+            );
+            const blob = await pageRes.blob();
+            const filename = `${
+              page.properties?.title?.title[0]?.plain_text?.replaceAll(
+                " ",
+                "-"
+              ) ?? "notion-file"
+            }-${page.id}.md`;
 
-      onFileSelect(pageData.files);
+            return new File([blob], filename, { type: blob.type });
+          }
+        )
+      );
+
+      onFileSelect(fileBlobs);
     } catch (error) {
       console.error("Error fetching Notion data:", error);
     }
 
     setLoading(false);
+    setAuthInitiated(false);
   }, [accessToken, onFileSelect]);
 
-  // trigger notion import, if the authentication is done
+  // trigger notion import after the authentication is done
   useEffect(() => {
     if (authInitiated && accessToken) {
       triggerNotionImport();
@@ -77,5 +101,7 @@ export function NotionHandler({ onFileSelect, notionRef }: NotionHandlerProps) {
     notionRef.triggerNotionImport = triggerNotionImport;
   }
 
-  return loading ? <p>Importing images from notion...</p> : null;
+  return loading ? (
+    <p className="text-xs">Importing data from notion...</p>
+  ) : null;
 }
