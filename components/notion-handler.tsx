@@ -1,5 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useState } from "react";
+import { LoaderIcon } from "./icons";
 
 interface NotionHandlerProps {
   onFileSelect: (files: File[]) => void;
@@ -101,7 +102,12 @@ export function NotionHandler({ onFileSelect, notionRef }: NotionHandlerProps) {
     notionRef.triggerNotionImport = triggerNotionImport;
   }
 
-  return loading ? (
-    <p className="text-xs">Importing data from notion...</p>
+  return !loading ? (
+    <div className="ml-2 flex items-center justify-center gap-1">
+      <div className="animate-spin text-sky-800">
+        <LoaderIcon size={12} />
+      </div>
+      <p className="text-xs text-sky-800">Importing files from notion</p>
+    </div>
   ) : null;
 }
