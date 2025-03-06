@@ -60,5 +60,5 @@ export function OneDrivePicker({ onFileSelect }: OneDrivePickerProps) {
     window.OneDrive?.open(odOptions);
   };
 
-  return <button onClick={openOneDrivePicker}>Upload from OneDrive</button>;
+  return <button onClick={openOneDrivePicker}>Add from OneDrive</button>;
 }

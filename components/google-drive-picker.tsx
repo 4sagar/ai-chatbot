@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 
 interface FileData {
   id: string;
@@ -12,7 +12,7 @@ interface GoogleDrivePickerProps {
   onFileSelect: (file: FileData) => void;
 }
 
-export function GoogleDrivePicker(props: GoogleDrivePickerProps) {
+export function GoogleDrivePicker({ onFileSelect }: GoogleDrivePickerProps) {
   const [gapiLoaded, setGapiLoaded] = useState(false);
   const [accessToken, setAccessToken] = useState<string | null>(
     localStorage.getItem("google-drive-access-token")
@@ -63,7 +63,7 @@ export function GoogleDrivePicker(props: GoogleDrivePickerProps) {
     );
   };
 
-  const loadPicker = () => {
+  const loadPicker = useCallback(() => {
     if (!accessToken) return authenticate();
 
     setLoading(true);
@@ -75,24 +75,24 @@ export function GoogleDrivePicker(props: GoogleDrivePickerProps) {
         .setCallback((data: any) => {
           if (data.action === "picked") {
             const file = data.docs[0];
-            props.onFileSelect(file);
+            onFileSelect(file);
           }
           setLoading(false);
         })
         .build();
       picker.setVisible(true);
     });
-  };
+  }, [accessToken, onFileSelect]);
 
   useEffect(() => {
     if (authInitiated && accessToken) {
       loadPicker();
     }
-  }, [authInitiated, accessToken, props.onFileSelect]);
+  }, [authInitiated, accessToken, onFileSelect, loadPicker]);
 
   return (
-    <button onClick={loadPicker} disabled={!gapiLoaded || loading} {...props}>
-      {loading ? "Google Picker Loading..." : "Upload from Google Drive"}
+    <button onClick={loadPicker} disabled={!gapiLoaded || loading}>
+      {loading ? "Google Picker Loading..." : "Add from Google Drive"}
     </button>
   );
 }

@@ -31,12 +31,14 @@ import {
   GoogleDriveIcon,
   OneDriveIcon,
   BoxIcon,
+  NotionIcon,
 } from "./icons";
 import { PreviewAttachment } from "./preview-attachment";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { GoogleDrivePicker } from "./google-drive-picker";
 import { OneDrivePicker } from "./one-drive-picker";
+import { NotionHandler } from "./notion-handler";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -319,6 +321,25 @@ function PureAttachmentsButton({
   isLoading: boolean;
   handleUploadingProcess: (files: File[]) => void;
 }) {
+  const notionRef: { triggerNotionImport: () => void } = {
+    triggerNotionImport: () => {},
+  };
+
+  const handleNotionClick = () => {
+    if (notionRef.triggerNotionImport) {
+      notionRef.triggerNotionImport();
+    }
+  };
+
+  const downloadFile = async (fileUrl: string, filename: string) => {
+    const response = await fetch(fileUrl);
+    const blob = await response.blob();
+    const file = new File([blob], `${filename}.${blob.type.split("/")[1]}`, {
+      type: blob.type,
+    });
+    return file;
+  };
+
   const handleGoogleDriveFilePick = async (file: {
     id: string;
     name: string;
@@ -352,46 +373,63 @@ function PureAttachmentsButton({
     }
   };
 
+  const handleNotionFileDownload = async (files: string[]) => {
+    const fileBlobs = await Promise.all(
+      files.map((file, i) => downloadFile(file, `notion-file-${i + 1}`))
+    );
+    handleUploadingProcess(fileBlobs);
+  };
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          className="rounded-md rounded-bl-lg p-[7px] h-fit dark:border-zinc-700 hover:dark:bg-zinc-900 hover:bg-zinc-200"
-          disabled={isLoading}
-          variant="ghost"
-        >
-          <PaperclipIcon size={14} />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuPortal>
-        <DropdownMenuContent align={"start"}>
-          <DropdownMenuItem
-            onSelect={() => {
-              fileInputRef.current?.click();
-            }}
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            className="rounded-md rounded-bl-lg p-[7px] h-fit dark:border-zinc-700 hover:dark:bg-zinc-900 hover:bg-zinc-200"
+            disabled={isLoading}
+            variant="ghost"
           >
-            <DownloadIcon />
-            Upload from computer
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onSelect={(e) => {
-              e.preventDefault();
-            }}
-          >
-            <GoogleDriveIcon />
-            <GoogleDrivePicker onFileSelect={handleGoogleDriveFilePick} />
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <OneDriveIcon />
-            <OneDrivePicker onFileSelect={handleGoogleDriveFilePick} />
-          </DropdownMenuItem>
-          <DropdownMenuItem>
+            <PaperclipIcon size={14} />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuPortal>
+          <DropdownMenuContent align={"start"}>
+            <DropdownMenuItem
+              onSelect={() => {
+                fileInputRef.current?.click();
+              }}
+            >
+              <DownloadIcon />
+              Upload from computer
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault();
+              }}
+            >
+              <GoogleDriveIcon />
+              <GoogleDrivePicker onFileSelect={handleGoogleDriveFilePick} />
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <OneDriveIcon />
+              <OneDrivePicker onFileSelect={handleGoogleDriveFilePick} />
+            </DropdownMenuItem>
+            {/* <DropdownMenuItem>
             <BoxIcon size={16} />
-            Upload from Box.com
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenuPortal>
-    </DropdownMenu>
+            Add from Box.com
+          </DropdownMenuItem> */}
+            <DropdownMenuItem onSelect={handleNotionClick}>
+              <NotionIcon size={16} />
+              Add from Notion
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenuPortal>
+      </DropdownMenu>
+      <NotionHandler
+        notionRef={notionRef}
+        onFileSelect={handleNotionFileDownload}
+      />
+    </>
   );
 }
 
