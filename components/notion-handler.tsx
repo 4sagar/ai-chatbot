@@ -102,7 +102,7 @@ export function NotionHandler({ onFileSelect, notionRef }: NotionHandlerProps) {
     notionRef.triggerNotionImport = triggerNotionImport;
   }
 
-  return !loading ? (
+  return loading ? (
     <div className="ml-2 flex items-center justify-center gap-1">
       <div className="animate-spin text-sky-800">
         <LoaderIcon size={12} />
