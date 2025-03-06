@@ -4,7 +4,7 @@ const { NotionToMarkdown } = require("notion-to-md");
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const token = req.headers.get("Authorization")?.replace("Bearer ", "").trim();
 
